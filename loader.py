@@ -1,7 +1,8 @@
 import os
 from typing import Literal
-import paramiko
-import psycopg2
+from application.batcher import BatchProcessor
+from infrastructure.images_downloader import ImageDownloadRepository
+from infrastructure.repository_sql import SQLOperationRepository
 
 db_url = os.getenv("DB_URL")
 ssh_host = os.getenv("SSH_HOST")
@@ -12,21 +13,19 @@ ssh_password = os.getenv("SSH_PASSWORD")
 class BatchGenerator:
     def __init__(self, local_path, batch_size, stone_type:Literal["acid", "carbonatap", "struvit", "wedelit", "wewelit"]):
         self.local_path = local_path
-        self.ssh_password = ssh_password
-        self.ssh_host = ssh_host
-        self.ssh_user = ssh_user
-        self.remote_path = remote_path
         self.batch_size = batch_size
         self.stone_type = stone_type
 
-        self.db = psycopg2.connect(db_url)
+        self.sql_repo = SQLOperationRepository(db_url=db_url)
+        self.download_repo = ImageDownloadRepository(ssh_password=ssh_password, ssh_host=ssh_host, ssh_user=ssh_user)
+        self.processor = BatchProcessor(self.sql_repo, self.download_repo)
 
-        ssh = paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    def generate_batch(self):
+        processor = BatchProcessor(self.sql_repo, self.download_repo)  
+        images = processor.get_batch(self.batch_size, self.stone_type, self.local_path, remote_path)
+        self.sql_repo.close_connection()
+        return images
 
-        ssh.connect(hostname=self.ssh_host, username=self.ssh_user, password=self.ssh_password)
-
-        sftp = ssh.open_sftp()
         
 
 
