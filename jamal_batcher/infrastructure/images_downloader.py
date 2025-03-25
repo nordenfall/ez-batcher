@@ -14,16 +14,22 @@ class ImageDownloadRepository(AbstractDownloadRepository):
 
     def download_remote_content(self, images:List[Image], local_path:str, remote_path:str):
         local_paths = []
+        
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh.connect(hostname=self.ssh_host, username=self.ssh_user, password=self.ssh_password)
         sftp = ssh.open_sftp()
         for image in images:
-            actual_remote_path = os.path.join(remote_path, image.stone_type, str(image.id) + ".jpg")
-            actual_local_path = os.path.join(local_path, str(image.id) + ".jpg")
-            print('downloading ' + actual_remote_path + ' into ' + actual_local_path)
-            sftp.get(actual_remote_path, actual_local_path)
-            local_paths.append(actual_local_path)
+            try:
+                actual_remote_path = os.path.join(remote_path, image.stone_type, str(image.id) + ".jpg")
+                actual_local_path = os.path.join(local_path, str(image.id) + ".jpg") 
+                sftp.get(actual_remote_path, actual_local_path)
+                print('downloading ' + actual_remote_path + ' into ' + actual_local_path)
+                local_paths.append(actual_local_path)
+            except FileNotFoundError:
+                print('file '+actual_remote_path+' not found')
+                continue
+
 
         sftp.close()
         ssh.close()

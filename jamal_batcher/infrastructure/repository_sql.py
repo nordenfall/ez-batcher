@@ -10,6 +10,14 @@ class SQLOperationRepository(AbstractImageRepository):
         self.cur = self.conn.cursor()
 
     def get_unused_images(self, batch_size:int, stone_type:str):
+        count_query = f"SELECT COUNT (*) FROM {stone_type} WHERE used = FALSE"
+        self.cur.execute(count_query)
+        if self.cur.fetchall()[0][0] < batch_size:
+            print("Недостаточно объектов для обучения, сброс репозитория . . .")
+            reset_query = f"UPDATE {stone_type} SET used = FALSE WHERE used = TRUE"
+            self.cur.execute(reset_query)
+            self.conn.commit()
+
         query = f"SELECT id, used FROM {stone_type} WHERE used = FALSE LIMIT %s"
         self.cur.execute(query, (batch_size,))
         return [Image(id=r[0],stone_type=stone_type) for r in self.cur.fetchall()]
