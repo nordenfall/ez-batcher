@@ -3,6 +3,9 @@ from typing import Literal
 from application.batcher import BatchProcessor
 from infrastructure.images_downloader import ImageDownloadRepository
 from infrastructure.repository_sql import SQLOperationRepository
+from dotenv import load_dotenv
+
+load_dotenv()
 
 db_url = os.getenv("DB_URL")
 ssh_host = os.getenv("SSH_HOST")
