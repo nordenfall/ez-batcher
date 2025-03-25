@@ -2,8 +2,8 @@ import os
 from typing import List
 
 import paramiko
-from domain.image import Image
-from domain.repository import AbstractDownloadRepository
+from ..domain.image import Image
+from ..domain.repository import AbstractDownloadRepository
 
 
 class ImageDownloadRepository(AbstractDownloadRepository):

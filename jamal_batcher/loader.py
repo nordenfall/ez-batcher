@@ -1,8 +1,8 @@
 import os
 from typing import Literal
-from application.batcher import BatchProcessor
-from infrastructure.images_downloader import ImageDownloadRepository
-from infrastructure.repository_sql import SQLOperationRepository
+from .application.batcher import BatchProcessor
+from .infrastructure.images_downloader import ImageDownloadRepository
+from .infrastructure.repository_sql import SQLOperationRepository
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -18,7 +18,6 @@ class BatchGenerator:
         self.local_path = local_path
         self.batch_size = batch_size
         self.stone_type = stone_type
-
         self.sql_repo = SQLOperationRepository(db_url=db_url)
         self.download_repo = ImageDownloadRepository(ssh_password=ssh_password, ssh_host=ssh_host, ssh_user=ssh_user)
         self.processor = BatchProcessor(self.sql_repo, self.download_repo)
@@ -28,6 +27,8 @@ class BatchGenerator:
         images = processor.get_batch(self.batch_size, self.stone_type, self.local_path, remote_path)
         self.sql_repo.close_connection()
         return images
+    
+__all__=["BatchGenerator"]
 
         
 

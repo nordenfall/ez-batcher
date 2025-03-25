@@ -1,7 +1,7 @@
 from typing import List
 import psycopg2
-from domain.image import Image
-from domain.repository import AbstractImageRepository
+from ..domain.image import Image
+from ..domain.repository import AbstractImageRepository
 
 
 class SQLOperationRepository(AbstractImageRepository):

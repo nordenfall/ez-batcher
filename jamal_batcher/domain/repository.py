@@ -1,6 +1,6 @@
 from abc import ABC
 from typing import List
-from domain.image import Image
+from .image import Image
 
 class AbstractImageRepository(ABC):
     @classmethod

@@ -1,4 +1,4 @@
-from domain.repository import AbstractDownloadRepository, AbstractImageRepository
+from ..domain.repository import AbstractDownloadRepository, AbstractImageRepository
 
 
 class BatchProcessor:
